@@ -39,6 +39,6 @@ setup(name='python-gflags',
       author_email='google-gflags@googlegroups.com',
       url='https://github.com/google/python-gflags',
       py_modules=["gflags", "gflags_validators"],
-      data_files=[("bin", ["gflags2man.py"])],
+      scripts=['gflags2man.py'],
       include_package_data=True,
 )
