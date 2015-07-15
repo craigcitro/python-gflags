@@ -36,7 +36,7 @@ Run the program, parse the output, and then format that into a man
 page.
 
 Usage:
-  gflags2man <program> [program] ...
+  %s <program> [program] ...
 """
 
 # TODO(csilvers): work with windows paths (\) as well as unix (/)

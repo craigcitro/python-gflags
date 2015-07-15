@@ -2392,25 +2392,31 @@ class HelpFlag(BooleanFlag):
   def __init__(self):
     BooleanFlag.__init__(self, "help", 0, "show this help",
                          short_name="?", allow_override=1)
+
   def Parse(self, arg):
     if arg:
-      doc = sys.modules["__main__"].__doc__
+      doc = sys.modules["__main__"].__doc__.replace('%s', sys.argv[0])
       flags = str(FLAGS)
       print doc or ("\nUSAGE: %s [flags]\n" % sys.argv[0])
       if flags:
         print "flags:"
         print flags
       sys.exit(1)
+
+
 class HelpXMLFlag(BooleanFlag):
   """Similar to HelpFlag, but generates output in XML format."""
   def __init__(self):
     BooleanFlag.__init__(self, 'helpxml', False,
                          'like --help, but generates XML output',
                          allow_override=1)
+
   def Parse(self, arg):
     if arg:
       FLAGS.WriteHelpInXMLFormat(sys.stdout)
       sys.exit(1)
+
+
 class HelpshortFlag(BooleanFlag):
   """
   HelpshortFlag is a special boolean flag that prints usage
@@ -2422,9 +2428,10 @@ class HelpshortFlag(BooleanFlag):
   def __init__(self):
     BooleanFlag.__init__(self, "helpshort", 0,
                          "show usage only for this module", allow_override=1)
+
   def Parse(self, arg):
     if arg:
-      doc = sys.modules["__main__"].__doc__
+      doc = sys.modules["__main__"].__doc__.replace('%s', sys.argv[0])
       flags = FLAGS.MainModuleHelp()
       print doc or ("\nUSAGE: %s [flags]\n" % sys.argv[0])
       if flags:
