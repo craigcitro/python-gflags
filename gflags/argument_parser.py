@@ -30,8 +30,8 @@
 
 """Contains base classes used to parse and convert arguments."""
 
-import cStringIO
 import csv
+import io
 import string
 
 
@@ -325,7 +325,7 @@ class CsvListSerializer(ArgumentSerializer):
 
   def Serialize(self, value):
     """Serialize a list as a string, if possible, or as a unicode string."""
-    output = cStringIO.StringIO()
+    output = io.StringIO()
     writer = csv.writer(output)
 
     # csv.writer doesn't accept unicode, so we convert to UTF-8.
@@ -382,7 +382,7 @@ class ListParser(BaseListParser):
     else:
       try:
         return [s.strip() for s in list(csv.reader([argument], strict=True))[0]]
-      except csv.Error, e:
+      except csv.Error as e:
         # Provide a helpful report for case like
         #   --listflag="$(printf 'hello,\nworld')"
         # IOW, list flag values containing naked newlines.  This error

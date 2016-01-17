@@ -14,6 +14,7 @@ gflags.DEFINE_string('seen_in_crittenden', 'alleged mountain lion',
 class FlagsUnicodeLiteralsTest(unittest.TestCase):
 
   def testUnicodeFlagNameAndValueAreGood(self):
+    # This call triggers UnparsedFlagAccessError.
     alleged_mountain_lion = gflags.FLAGS.seen_in_crittenden
     self.assertTrue(
         isinstance(alleged_mountain_lion, type(u'')),

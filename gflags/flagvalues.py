@@ -244,7 +244,7 @@ class FlagValues(object):
       If no such module exists (i.e. no flag with this name exists),
       we return default.
     """
-    for module, flags in self.FlagsByModuleDict().iteritems():
+    for module, flags in iter(self.FlagsByModuleDict().items()):
       for flag in flags:
         if flag.name == flagname or flag.short_name == flagname:
           return module
@@ -263,7 +263,7 @@ class FlagValues(object):
       If no such module exists (i.e. no flag with this name exists),
       we return default.
     """
-    for module_id, flags in self.FlagsByModuleIdDict().iteritems():
+    for module_id, flags in iter(self.FlagsByModuleIdDict().items()):
       for flag in flags:
         if flag.name == flagname or flag.short_name == flagname:
           return module_id
@@ -275,7 +275,7 @@ class FlagValues(object):
     Args:
       flag_values: registry to copy from
     """
-    for flag_name, flag in flag_values.FlagDict().iteritems():
+    for flag_name, flag in iter(flag_values.FlagDict().items()):
       # Each flags with shortname appears here twice (once under its
       # normal name, and again with its short name).  To prevent
       # problems (DuplicateFlagError) with double flag registration, we
@@ -405,7 +405,7 @@ class FlagValues(object):
 
   def _AssertAllValidators(self):
     all_validators = set()
-    for flag in self.FlagDict().itervalues():
+    for flag in iter(self.FlagDict().values()):
       for validator in flag.validators:
         all_validators.add(validator)
     self._AssertValidators(all_validators)
@@ -425,7 +425,7 @@ class FlagValues(object):
         validators, key=lambda validator: validator.insertion_index):
       try:
         validator.Verify(self)
-      except gflags_validators.Error, e:
+      except gflags_validators.Error as e:
         message = validator.PrintFlagsWithValues(self)
         raise exceptions.IllegalFlagValue('%s: %s' % (message, str(e)))
 
@@ -500,7 +500,7 @@ class FlagValues(object):
         flags.
       flag_obj: A flag object.
     """
-    for unused_module, flags_in_module in flags_by_module_dict.iteritems():
+    for unused_module, flags_in_module in iter(flags_by_module_dict.items()):
       # while (as opposed to if) takes care of multiple occurrences of a
       # flag in the list for the same module.
       while flag_obj in flags_in_module:
@@ -851,14 +851,14 @@ class FlagValues(object):
     # name (the latter check uses cached info from the previous loop).
     shortest_matches = {}
     prev_idx = 0
-    for flag_idx in xrange(len(sorted_flags)):
+    for flag_idx in range(len(sorted_flags)):
       curr = sorted_flags[flag_idx]
       if flag_idx == (len(sorted_flags) - 1):
         next_flag = None
       else:
         next_flag = sorted_flags[flag_idx+1]
         next_flag_len = len(next_flag)
-      for curr_idx in xrange(len(curr)):
+      for curr_idx in range(len(curr)):
         if (next_flag is None
             or curr_idx >= next_flag_len
             or curr[curr_idx] != next_flag[curr_idx]):
@@ -945,7 +945,7 @@ class FlagValues(object):
     flag_line_list = []  # Subset of lines w/o comments, blanks, flagfile= tags.
     try:
       file_obj = open(filename, 'r')
-    except IOError, e_msg:
+    except IOError as e_msg:
       raise exceptions.CantOpenFlagFileError(
           'ERROR:: Unable to open flagfile: %s' % e_msg)
 

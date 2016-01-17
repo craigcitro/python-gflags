@@ -414,7 +414,7 @@ def ADOPT_module_key_flags(  # pylint: disable=g-bad-name
         # a different module.  So, we can't use _GetKeyFlagsForModule.
         # Instead, we take all flags from _SPECIAL_FLAGS (a private
         # FlagValues, where no other module should register flags).
-        [f.name for f in _helpers.SPECIAL_FLAGS.FlagDict().itervalues()],
+        [f.name for f in iter(_helpers.SPECIAL_FLAGS.FlagDict().values())],
         flag_values=_helpers.SPECIAL_FLAGS,
         key_flag_values=flag_values)
 
