@@ -33,7 +33,6 @@
 #   Amit Patel, Bogdan Cocosel, Daniel Dulitz, Eric Tiedemann,
 #   Eric Veach, Laurence Gonsalves, Matthew Springer, Craig Silverstein,
 #   Vladimir Rusinov
-
 """This module is used to define and parse command line flags.
 
 This module defines a *distributed* flag-definition policy: rather than
@@ -62,7 +61,6 @@ from gflags import exceptions
 from gflags import flag as _flag
 from gflags import flagvalues
 from gflags import validators as gflags_validators
-
 
 # Add current module to disclaimed module ids.
 _helpers.disclaim_module_ids.add(id(sys.modules[__name__]))
@@ -119,12 +117,8 @@ WhitespaceSeparatedListParser = argument_parser.WhitespaceSeparatedListParser
 
 # pylint: enable=invalid-name
 
-
-
-
 # The global FlagValues instance
 FLAGS = FlagValues()
-
 
 # Flags validators
 
@@ -133,7 +127,7 @@ def RegisterValidator(flag_name,
                       checker,
                       message='Flag validation failed',
                       flag_values=FLAGS):
-  """Adds a constraint, which will be enforced during program execution.
+    """Adds a constraint, which will be enforced during program execution.
 
   The constraint is validated when flags are initially parsed, and after each
   change of the corresponding flag's value.
@@ -154,13 +148,12 @@ def RegisterValidator(flag_name,
   Raises:
     AttributeError: if flag_name is not registered as a valid flag name.
   """
-  flag_values.AddValidator(gflags_validators.SimpleValidator(flag_name,
-                                                            checker,
-                                                            message))
+    flag_values.AddValidator(gflags_validators.SimpleValidator(
+        flag_name, checker, message))
 
 
 def Validator(flag_name, message='Flag validation failed', flag_values=FLAGS):
-  """A function decorator for defining a flag validator.
+    """A function decorator for defining a flag validator.
 
   Registers the decorated function as a validator for flag_name, e.g.
 
@@ -182,16 +175,18 @@ def Validator(flag_name, message='Flag validation failed', flag_values=FLAGS):
     AttributeError: if flag_name is not registered as a valid flag name.
   """
 
-  def Decorate(function):
-    RegisterValidator(flag_name, function,
-                      message=message,
-                      flag_values=flag_values)
-    return function
-  return Decorate
+    def Decorate(function):
+        RegisterValidator(flag_name,
+                          function,
+                          message=message,
+                          flag_values=flag_values)
+        return function
+
+    return Decorate
 
 
 def MarkFlagAsRequired(flag_name, flag_values=FLAGS):
-  """Ensure that flag is not None during program execution.
+    """Ensure that flag is not None during program execution.
 
   Registers a flag validator, which will follow usual validator rules.
   Important note: validator will pass for any non-None value, such as False,
@@ -214,20 +209,20 @@ def MarkFlagAsRequired(flag_name, flag_values=FLAGS):
   Raises:
     AttributeError: if flag_name is not registered as a valid flag name.
   """
-  if flag_values.GetFlag(flag_name).default is not None:
-    # TODO(vrusinov): Turn this warning into an exception.
-    warnings.warn(
-        'Flag %s has a non-None default value; therefore, '
-        'MarkFlagAsRequired will pass even if flag is not specified in the '
-        'command line!' % flag_name)
-  RegisterValidator(flag_name,
-                    lambda value: value is not None,
-                    message='Flag --%s must be specified.' % flag_name,
-                    flag_values=flag_values)
+    if flag_values.GetFlag(flag_name).default is not None:
+        # TODO(vrusinov): Turn this warning into an exception.
+        warnings.warn(
+            'Flag %s has a non-None default value; therefore, '
+            'MarkFlagAsRequired will pass even if flag is not specified in the '
+            'command line!' % flag_name)
+    RegisterValidator(flag_name,
+                      lambda value: value is not None,
+                      message='Flag --%s must be specified.' % flag_name,
+                      flag_values=flag_values)
 
 
 def _RegisterBoundsValidatorIfNeeded(parser, name, flag_values):
-  """Enforce lower and upper bounds for numeric flags.
+    """Enforce lower and upper bounds for numeric flags.
 
   Args:
     parser: NumericParser (either FloatParser or IntegerParser). Provides lower
@@ -235,18 +230,15 @@ def _RegisterBoundsValidatorIfNeeded(parser, name, flag_values):
     name: string, name of the flag
     flag_values: FlagValues
   """
-  if parser.lower_bound is not None or parser.upper_bound is not None:
+    if parser.lower_bound is not None or parser.upper_bound is not None:
 
-    def Checker(value):
-      if value is not None and parser.IsOutsideBounds(value):
-        message = '%s is not %s' % (value, parser.syntactic_help)
-        raise gflags_validators.Error(message)
-      return True
+        def Checker(value):
+            if value is not None and parser.IsOutsideBounds(value):
+                message = '%s is not %s' % (value, parser.syntactic_help)
+                raise gflags_validators.Error(message)
+            return True
 
-    RegisterValidator(name,
-                      Checker,
-                      flag_values=flag_values)
-
+        RegisterValidator(name, Checker, flag_values=flag_values)
 
 # The DEFINE functions are explained in more details in the module doc string.
 
@@ -255,7 +247,7 @@ def _RegisterBoundsValidatorIfNeeded(parser, name, flag_values):
 # (here and in other DEFINE_* functions).
 def DEFINE(parser, name, default, help, flag_values=FLAGS, serializer=None,  # pylint: disable=redefined-builtin
            module_name=None, **args):
-  """Registers a generic Flag object.
+    """Registers a generic Flag object.
 
   NOTE: in the docstrings of all DEFINE* functions, "registers" is short
   for "creates a new flag and registers it".
@@ -275,12 +267,15 @@ def DEFINE(parser, name, default, help, flag_values=FLAGS, serializer=None,  # p
     **args: Dictionary with extra keyword args that are passed to the
         Flag __init__.
   """
-  DEFINE_flag(Flag(parser, serializer, name, default, help, **args),
-              flag_values, module_name)
+    DEFINE_flag(
+        Flag(parser, serializer, name, default, help, **args), flag_values,
+        module_name)
 
 
-def DEFINE_flag(flag, flag_values=FLAGS, module_name=None):  # pylint: disable=g-bad-name
-  """Registers a 'Flag' object with a 'FlagValues' object.
+def DEFINE_flag(flag,
+                flag_values=FLAGS,
+                module_name=None):  # pylint: disable=g-bad-name
+    """Registers a 'Flag' object with a 'FlagValues' object.
 
   By default, the global FLAGS 'FlagValue' object is used.
 
@@ -295,31 +290,32 @@ def DEFINE_flag(flag, flag_values=FLAGS, module_name=None):  # pylint: disable=g
     module_name: A string, the name of the Python module declaring this flag.
         If not provided, it will be computed using the stack trace of this call.
   """
-  # copying the reference to flag_values prevents pychecker warnings
-  fv = flag_values
-  fv[flag.name] = flag
-  # Tell flag_values who's defining the flag.
-  if isinstance(flag_values, FlagValues):
-    # Regarding the above isinstance test: some users pass funny
-    # values of flag_values (e.g., {}) in order to avoid the flag
-    # registration (in the past, there used to be a flag_values ==
-    # FLAGS test here) and redefine flags with the same name (e.g.,
-    # debug).  To avoid breaking their code, we perform the
-    # registration only if flag_values is a real FlagValues object.
-    if module_name:
-      module = sys.modules[module_name]
-    else:
-      module, module_name = _helpers.GetCallingModuleObjectAndName()
-    # TODO(vrusinov): _RegisterFlagByModule* should be public.
-    # pylint: disable=protected-access
-    flag_values._RegisterFlagByModule(module_name, flag)
-    flag_values._RegisterFlagByModuleId(id(module), flag)
-    # pylint: enable=protected-access
+    # copying the reference to flag_values prevents pychecker warnings
+    fv = flag_values
+    fv[flag.name] = flag
+    # Tell flag_values who's defining the flag.
+    if isinstance(flag_values, FlagValues):
+        # Regarding the above isinstance test: some users pass funny
+        # values of flag_values (e.g., {}) in order to avoid the flag
+        # registration (in the past, there used to be a flag_values ==
+        # FLAGS test here) and redefine flags with the same name (e.g.,
+        # debug).  To avoid breaking their code, we perform the
+        # registration only if flag_values is a real FlagValues object.
+        if module_name:
+            module = sys.modules[module_name]
+        else:
+            module, module_name = _helpers.GetCallingModuleObjectAndName()
+        # TODO(vrusinov): _RegisterFlagByModule* should be public.
+        # pylint: disable=protected-access
+        flag_values._RegisterFlagByModule(module_name, flag)
+        flag_values._RegisterFlagByModuleId(id(module), flag)
+        # pylint: enable=protected-access
 
 
 def _InternalDeclareKeyFlags(flag_names,
-                             flag_values=FLAGS, key_flag_values=None):
-  """Declares a flag as key for the calling module.
+                             flag_values=FLAGS,
+                             key_flag_values=None):
+    """Declares a flag as key for the calling module.
 
   Internal function.  User code should call DECLARE_key_flag or
   ADOPT_module_key_flags instead.
@@ -340,19 +336,21 @@ def _InternalDeclareKeyFlags(flag_names,
     UnrecognizedFlagError: when we refer to a flag that was not
       defined yet.
   """
-  key_flag_values = key_flag_values or flag_values
+    key_flag_values = key_flag_values or flag_values
 
-  module = _GetCallingModule()
+    module = _GetCallingModule()
 
-  for flag_name in flag_names:
-    flag = flag_values.GetFlag(flag_name)
-    # TODO(vrusinov): _RegisterKeyFlagForModule should be public.
-    key_flag_values._RegisterKeyFlagForModule(module, flag)  # pylint: disable=protected-access
+    for flag_name in flag_names:
+        flag = flag_values.GetFlag(flag_name)
+        # TODO(vrusinov): _RegisterKeyFlagForModule should be public.
+        key_flag_values._RegisterKeyFlagForModule(
+            module, flag)  # pylint: disable=protected-access
 
 
 def DECLARE_key_flag(  # pylint: disable=g-bad-name
-    flag_name, flag_values=FLAGS):
-  """Declares one flag as key to the current module.
+        flag_name,
+        flag_values=FLAGS):
+    """Declares one flag as key to the current module.
 
   Key flags are flags that are deemed really important for a module.
   They are important when listing help messages; e.g., if the
@@ -371,21 +369,22 @@ def DECLARE_key_flag(  # pylint: disable=g-bad-name
     flag_values: A FlagValues object.  This should almost never
       need to be overridden.
   """
-  if flag_name in _helpers.SPECIAL_FLAGS:
-    # Take care of the special flags, e.g., --flagfile, --undefok.
-    # These flags are defined in _SPECIAL_FLAGS, and are treated
-    # specially during flag parsing, taking precedence over the
-    # user-defined flags.
-    _InternalDeclareKeyFlags([flag_name],
-                             flag_values=_helpers.SPECIAL_FLAGS,
-                             key_flag_values=flag_values)
-    return
-  _InternalDeclareKeyFlags([flag_name], flag_values=flag_values)
+    if flag_name in _helpers.SPECIAL_FLAGS:
+        # Take care of the special flags, e.g., --flagfile, --undefok.
+        # These flags are defined in _SPECIAL_FLAGS, and are treated
+        # specially during flag parsing, taking precedence over the
+        # user-defined flags.
+        _InternalDeclareKeyFlags([flag_name],
+                                 flag_values=_helpers.SPECIAL_FLAGS,
+                                 key_flag_values=flag_values)
+        return
+    _InternalDeclareKeyFlags([flag_name], flag_values=flag_values)
 
 
 def ADOPT_module_key_flags(  # pylint: disable=g-bad-name
-    module, flag_values=FLAGS):
-  """Declares that all flags key to a module are key to the current module.
+        module,
+        flag_values=FLAGS):
+    """Declares that all flags key to a module are key to the current module.
 
   Args:
     module: A module object.
@@ -396,31 +395,31 @@ def ADOPT_module_key_flags(  # pylint: disable=g-bad-name
     FlagsError: When given an argument that is a module name (a
     string), instead of a module object.
   """
-  # NOTE(salcianu): an even better test would be if not
-  # isinstance(module, types.ModuleType) but I didn't want to import
-  # types for such a tiny use.
-  if isinstance(module, str):
-    raise FlagsError('Received module name %s; expected a module object.'
-                     % module)
-  # TODO(vrusinov): _GetKeyFlagsForModule should be public.
-  _InternalDeclareKeyFlags(
-      [f.name for f in flag_values._GetKeyFlagsForModule(module.__name__)],  # pylint: disable=protected-access
-      flag_values=flag_values)
-  # If module is this flag module, take _SPECIAL_FLAGS into account.
-  if module == _helpers.GetModuleObjectAndName(globals())[0]:
+    # NOTE(salcianu): an even better test would be if not
+    # isinstance(module, types.ModuleType) but I didn't want to import
+    # types for such a tiny use.
+    if isinstance(module, str):
+        raise FlagsError('Received module name %s; expected a module object.' %
+                         module)
+    # TODO(vrusinov): _GetKeyFlagsForModule should be public.
     _InternalDeclareKeyFlags(
-        # As we associate flags with _GetCallingModuleObjectAndName(), the
-        # special flags defined in this module are incorrectly registered with
-        # a different module.  So, we can't use _GetKeyFlagsForModule.
-        # Instead, we take all flags from _SPECIAL_FLAGS (a private
-        # FlagValues, where no other module should register flags).
-        [f.name for f in _helpers.SPECIAL_FLAGS.FlagDict().itervalues()],
-        flag_values=_helpers.SPECIAL_FLAGS,
-        key_flag_values=flag_values)
+        [f.name for f in flag_values._GetKeyFlagsForModule(module.__name__)],  # pylint: disable=protected-access
+        flag_values=flag_values)
+    # If module is this flag module, take _SPECIAL_FLAGS into account.
+    if module == _helpers.GetModuleObjectAndName(globals())[0]:
+        _InternalDeclareKeyFlags(
+            # As we associate flags with _GetCallingModuleObjectAndName(), the
+            # special flags defined in this module are incorrectly registered with
+            # a different module.  So, we can't use _GetKeyFlagsForModule.
+            # Instead, we take all flags from _SPECIAL_FLAGS (a private
+            # FlagValues, where no other module should register flags).
+            [f.name for f in _helpers.SPECIAL_FLAGS.FlagDict().values()],
+            flag_values=_helpers.SPECIAL_FLAGS,
+            key_flag_values=flag_values)
 
 
 def DISCLAIM_key_flags():  # pylint: disable=g-bad-name
-  """Declares that the current module will not define any more key flags.
+    """Declares that the current module will not define any more key flags.
 
   Normally, the module that calls the DEFINE_xxx functions claims the
   flag to be its key flag.  This is undesirable for modules that
@@ -433,10 +432,10 @@ def DISCLAIM_key_flags():  # pylint: disable=g-bad-name
   After calling this function, the module will not be able to define
   any more flags.  This function will affect all FlagValues objects.
   """
-  globals_for_caller = sys._getframe(1).f_globals  # pylint: disable=protected-access
-  module, _ = _GetModuleObjectAndName(globals_for_caller)
-  _helpers.disclaim_module_ids.add(id(module))
-
+    globals_for_caller = sys._getframe(
+        1).f_globals  # pylint: disable=protected-access
+    module, _ = _GetModuleObjectAndName(globals_for_caller)
+    _helpers.disclaim_module_ids.add(id(module))
 
 #
 # STRING FLAGS
@@ -444,16 +443,25 @@ def DISCLAIM_key_flags():  # pylint: disable=g-bad-name
 
 
 def DEFINE_string(  # pylint: disable=g-bad-name,redefined-builtin
-    name, default, help, flag_values=FLAGS, **args):
-  """Registers a flag whose value can be any string."""
-  parser = ArgumentParser()
-  serializer = ArgumentSerializer()
-  DEFINE(parser, name, default, help, flag_values, serializer, **args)
+        name,
+        default,
+        help,
+        flag_values=FLAGS,
+        **args):
+    """Registers a flag whose value can be any string."""
+    parser = ArgumentParser()
+    serializer = ArgumentSerializer()
+    DEFINE(parser, name, default, help, flag_values, serializer, **args)
 
 
 def DEFINE_boolean(  # pylint: disable=g-bad-name,redefined-builtin
-    name, default, help, flag_values=FLAGS, module_name=None, **args):
-  """Registers a boolean flag.
+        name,
+        default,
+        help,
+        flag_values=FLAGS,
+        module_name=None,
+        **args):
+    """Registers a boolean flag.
 
   Such a boolean flag does not take an argument.  If a user wants to
   specify a false value explicitly, the long option beginning with 'no'
@@ -473,18 +481,22 @@ def DEFINE_boolean(  # pylint: disable=g-bad-name,redefined-builtin
     **args: Dictionary with extra keyword args that are passed to the
         Flag __init__.
   """
-  DEFINE_flag(BooleanFlag(name, default, help, **args),
-              flag_values, module_name)
-
+    DEFINE_flag(
+        BooleanFlag(name, default, help, **args), flag_values, module_name)
 
 # Match C++ API to unconfuse C++ people.
 DEFINE_bool = DEFINE_boolean  # pylint: disable=g-bad-name
 
 
 def DEFINE_float(  # pylint: disable=g-bad-name,redefined-builtin
-    name, default, help, lower_bound=None, upper_bound=None,
-    flag_values=FLAGS, **args):   # pylint: disable=g-bad-name
-  """Registers a flag whose value must be a float.
+        name,
+        default,
+        help,
+        lower_bound=None,
+        upper_bound=None,
+        flag_values=FLAGS,
+        **args):  # pylint: disable=g-bad-name
+    """Registers a flag whose value must be a float.
 
   If lower_bound or upper_bound are set, then this flag must be
   within the given range.
@@ -498,16 +510,21 @@ def DEFINE_float(  # pylint: disable=g-bad-name,redefined-builtin
     flag_values: FlagValues object with which the flag will be registered.
     **args: additional arguments to pass to DEFINE.
   """
-  parser = FloatParser(lower_bound, upper_bound)
-  serializer = ArgumentSerializer()
-  DEFINE(parser, name, default, help, flag_values, serializer, **args)
-  _RegisterBoundsValidatorIfNeeded(parser, name, flag_values=flag_values)
+    parser = FloatParser(lower_bound, upper_bound)
+    serializer = ArgumentSerializer()
+    DEFINE(parser, name, default, help, flag_values, serializer, **args)
+    _RegisterBoundsValidatorIfNeeded(parser, name, flag_values=flag_values)
 
 
 def DEFINE_integer(  # pylint: disable=g-bad-name,redefined-builtin
-    name, default, help, lower_bound=None, upper_bound=None,
-    flag_values=FLAGS, **args):
-  """Registers a flag whose value must be an integer.
+        name,
+        default,
+        help,
+        lower_bound=None,
+        upper_bound=None,
+        flag_values=FLAGS,
+        **args):
+    """Registers a flag whose value must be an integer.
 
   If lower_bound, or upper_bound are set, then this flag must be
   within the given range.
@@ -521,16 +538,21 @@ def DEFINE_integer(  # pylint: disable=g-bad-name,redefined-builtin
     flag_values: FlagValues object with which the flag will be registered.
     **args: additional arguments to pass to DEFINE.
   """
-  parser = IntegerParser(lower_bound, upper_bound)
-  serializer = ArgumentSerializer()
-  DEFINE(parser, name, default, help, flag_values, serializer, **args)
-  _RegisterBoundsValidatorIfNeeded(parser, name, flag_values=flag_values)
+    parser = IntegerParser(lower_bound, upper_bound)
+    serializer = ArgumentSerializer()
+    DEFINE(parser, name, default, help, flag_values, serializer, **args)
+    _RegisterBoundsValidatorIfNeeded(parser, name, flag_values=flag_values)
 
 
 def DEFINE_enum(  # pylint: disable=g-bad-name,redefined-builtin
-    name, default, enum_values, help, flag_values=FLAGS, module_name=None,
-    **args):
-  """Registers a flag whose value can be any string from enum_values.
+        name,
+        default,
+        enum_values,
+        help,
+        flag_values=FLAGS,
+        module_name=None,
+        **args):
+    """Registers a flag whose value can be any string from enum_values.
 
   Args:
     name: A string, the flag name.
@@ -543,13 +565,18 @@ def DEFINE_enum(  # pylint: disable=g-bad-name,redefined-builtin
     **args: Dictionary with extra keyword args that are passed to the
         Flag __init__.
   """
-  DEFINE_flag(EnumFlag(name, default, help, enum_values, ** args),
-              flag_values, module_name)
+    DEFINE_flag(
+        EnumFlag(name, default, help, enum_values, **args), flag_values,
+        module_name)
 
 
 def DEFINE_list(  # pylint: disable=g-bad-name,redefined-builtin
-    name, default, help, flag_values=FLAGS, **args):
-  """Registers a flag whose value is a comma-separated list of strings.
+        name,
+        default,
+        help,
+        flag_values=FLAGS,
+        **args):
+    """Registers a flag whose value is a comma-separated list of strings.
 
   The flag value is parsed with a CSV parser.
 
@@ -561,14 +588,19 @@ def DEFINE_list(  # pylint: disable=g-bad-name,redefined-builtin
     **args: Dictionary with extra keyword args that are passed to the
         Flag __init__.
   """
-  parser = ListParser()
-  serializer = CsvListSerializer(',')
-  DEFINE(parser, name, default, help, flag_values, serializer, **args)
+    parser = ListParser()
+    serializer = CsvListSerializer(',')
+    DEFINE(parser, name, default, help, flag_values, serializer, **args)
 
 
 def DEFINE_spaceseplist(  # pylint: disable=g-bad-name,redefined-builtin
-    name, default, help, comma_compat=False, flag_values=FLAGS, **args):
-  """Registers a flag whose value is a whitespace-separated list of strings.
+        name,
+        default,
+        help,
+        comma_compat=False,
+        flag_values=FLAGS,
+        **args):
+    """Registers a flag whose value is a whitespace-separated list of strings.
 
   Any whitespace can be used as a separator.
 
@@ -583,15 +615,21 @@ def DEFINE_spaceseplist(  # pylint: disable=g-bad-name,redefined-builtin
     **args: Dictionary with extra keyword args that are passed to the
         Flag __init__.
   """
-  parser = WhitespaceSeparatedListParser(comma_compat=comma_compat)
-  serializer = ListSerializer(' ')
-  DEFINE(parser, name, default, help, flag_values, serializer, **args)
+    parser = WhitespaceSeparatedListParser(comma_compat=comma_compat)
+    serializer = ListSerializer(' ')
+    DEFINE(parser, name, default, help, flag_values, serializer, **args)
 
 
 def DEFINE_multi(  # pylint: disable=g-bad-name,redefined-builtin
-    parser, serializer, name, default, help, flag_values=FLAGS,
-    module_name=None, **args):
-  """Registers a generic MultiFlag that parses its args with a given parser.
+        parser,
+        serializer,
+        name,
+        default,
+        help,
+        flag_values=FLAGS,
+        module_name=None,
+        **args):
+    """Registers a generic MultiFlag that parses its args with a given parser.
 
   Auxiliary function.  Normal users should NOT use it directly.
 
@@ -611,13 +649,18 @@ def DEFINE_multi(  # pylint: disable=g-bad-name,redefined-builtin
     **args: Dictionary with extra keyword args that are passed to the
         Flag __init__.
   """
-  DEFINE_flag(MultiFlag(parser, serializer, name, default, help, **args),
-              flag_values, module_name)
+    DEFINE_flag(
+        MultiFlag(parser, serializer, name, default, help, **args),
+        flag_values, module_name)
 
 
 def DEFINE_multistring(  # pylint: disable=g-bad-name,redefined-builtin
-    name, default, help, flag_values=FLAGS, **args):
-  """Registers a flag whose value can be a list of any strings.
+        name,
+        default,
+        help,
+        flag_values=FLAGS,
+        **args):
+    """Registers a flag whose value can be a list of any strings.
 
   Use the flag on the command line multiple times to place multiple
   string values into the list.  The 'default' may be a single string
@@ -633,15 +676,20 @@ def DEFINE_multistring(  # pylint: disable=g-bad-name,redefined-builtin
     **args: Dictionary with extra keyword args that are passed to the
         Flag __init__.
   """
-  parser = ArgumentParser()
-  serializer = ArgumentSerializer()
-  DEFINE_multi(parser, serializer, name, default, help, flag_values, **args)
+    parser = ArgumentParser()
+    serializer = ArgumentSerializer()
+    DEFINE_multi(parser, serializer, name, default, help, flag_values, **args)
 
 
 def DEFINE_multi_int(  # pylint: disable=g-bad-name,redefined-builtin
-    name, default, help, lower_bound=None, upper_bound=None,
-    flag_values=FLAGS, **args):
-  """Registers a flag whose value can be a list of arbitrary integers.
+        name,
+        default,
+        help,
+        lower_bound=None,
+        upper_bound=None,
+        flag_values=FLAGS,
+        **args):
+    """Registers a flag whose value can be a list of arbitrary integers.
 
   Use the flag on the command line multiple times to place multiple
   integer values into the list.  The 'default' may be a single integer
@@ -658,15 +706,20 @@ def DEFINE_multi_int(  # pylint: disable=g-bad-name,redefined-builtin
     **args: Dictionary with extra keyword args that are passed to the
         Flag __init__.
   """
-  parser = IntegerParser(lower_bound, upper_bound)
-  serializer = ArgumentSerializer()
-  DEFINE_multi(parser, serializer, name, default, help, flag_values, **args)
+    parser = IntegerParser(lower_bound, upper_bound)
+    serializer = ArgumentSerializer()
+    DEFINE_multi(parser, serializer, name, default, help, flag_values, **args)
 
 
 def DEFINE_multi_float(  # pylint: disable=g-bad-name,redefined-builtin
-    name, default, help, lower_bound=None, upper_bound=None,
-    flag_values=FLAGS, **args):
-  """Registers a flag whose value can be a list of arbitrary floats.
+        name,
+        default,
+        help,
+        lower_bound=None,
+        upper_bound=None,
+        flag_values=FLAGS,
+        **args):
+    """Registers a flag whose value can be a list of arbitrary floats.
 
   Use the flag on the command line multiple times to place multiple
   float values into the list.  The 'default' may be a single float
@@ -683,15 +736,20 @@ def DEFINE_multi_float(  # pylint: disable=g-bad-name,redefined-builtin
     **args: Dictionary with extra keyword args that are passed to the
         Flag __init__.
   """
-  parser = FloatParser(lower_bound, upper_bound)
-  serializer = ArgumentSerializer()
-  DEFINE_multi(parser, serializer, name, default, help, flag_values, **args)
+    parser = FloatParser(lower_bound, upper_bound)
+    serializer = ArgumentSerializer()
+    DEFINE_multi(parser, serializer, name, default, help, flag_values, **args)
 
 
 def DEFINE_multi_enum(  # pylint: disable=g-bad-name,redefined-builtin
-    name, default, enum_values, help, flag_values=FLAGS, case_sensitive=True,
-    **args):
-  """Registers a flag whose value can be a list strings from enum_values.
+        name,
+        default,
+        enum_values,
+        help,
+        flag_values=FLAGS,
+        case_sensitive=True,
+        **args):
+    """Registers a flag whose value can be a list strings from enum_values.
 
   Use the flag on the command line multiple times to place multiple
   enum values into the list.  The 'default' may be a single string
@@ -708,13 +766,16 @@ def DEFINE_multi_enum(  # pylint: disable=g-bad-name,redefined-builtin
     **args: Dictionary with extra keyword args that are passed to the
         Flag __init__.
   """
-  parser = EnumParser(enum_values, case_sensitive)
-  serializer = ArgumentSerializer()
-  DEFINE_multi(parser, serializer, name, default, help, flag_values, **args)
+    parser = EnumParser(enum_values, case_sensitive)
+    serializer = ArgumentSerializer()
+    DEFINE_multi(parser, serializer, name, default, help, flag_values, **args)
 
 
-def DEFINE_alias(name, original_name, flag_values=FLAGS, module_name=None):  # pylint: disable=g-bad-name
-  """Define an alias flag for an existing one.
+def DEFINE_alias(name,
+                 original_name,
+                 flag_values=FLAGS,
+                 module_name=None):  # pylint: disable=g-bad-name
+    """Define an alias flag for an existing one.
 
   Args:
     name: A string, name of the alias flag.
@@ -727,33 +788,39 @@ def DEFINE_alias(name, original_name, flag_values=FLAGS, module_name=None):  # p
       UnrecognizedFlag: if the referenced flag doesn't exist.
       DuplicateFlag: if the alias name has been used by some existing flag.
   """
-  if original_name not in flag_values:
-    raise UnrecognizedFlag('Flag --%s is not defined.' % original_name)
-  flag = flag_values[original_name]
+    if original_name not in flag_values:
+        raise UnrecognizedFlag('Flag --%s is not defined.' % original_name)
+    flag = flag_values[original_name]
 
-  class _Parser(ArgumentParser):
-    """The parser for the alias flag calls the original flag parser."""
+    class _Parser(ArgumentParser):
+        """The parser for the alias flag calls the original flag parser."""
 
-    def Parse(self, argument):
-      flag.Parse(argument)
-      return flag.value
+        def Parse(self, argument):
+            flag.Parse(argument)
+            return flag.value
 
-  class _FlagAlias(Flag):
-    """Overrides Flag class so alias value is copy of original flag value."""
+    class _FlagAlias(Flag):
+        """Overrides Flag class so alias value is copy of original flag value."""
 
-    @property
-    def value(self):
-      return flag.value
+        @property
+        def value(self):
+            return flag.value
 
-    @value.setter
-    def value(self, value):
-      flag.value = value
+        @value.setter
+        def value(self, value):
+            flag.value = value
 
-  help_msg = 'Alias for --%s.' % flag.name
-  # If alias_name has been used, gflags.DuplicatedFlag will be raised.
-  DEFINE_flag(_FlagAlias(_Parser(), flag.serializer, name, flag.default,
-                         help_msg, boolean=flag.boolean),
-              flag_values, module_name)
+    help_msg = 'Alias for --%s.' % flag.name
+    # If alias_name has been used, gflags.DuplicatedFlag will be raised.
+    DEFINE_flag(
+        _FlagAlias(_Parser(),
+                   flag.serializer,
+                   name,
+                   flag.default,
+                   help_msg,
+                   boolean=flag.boolean),
+        flag_values,
+        module_name)
 
 
 DEFINE_string(
@@ -761,9 +828,9 @@ DEFINE_string(
     'Insert flag definitions from the given file into the command line.',
     _helpers.SPECIAL_FLAGS)
 
-DEFINE_string(
-    'undefok', '',
-    'comma-separated list of flag names that it is okay to specify '
-    'on the command line even if the program does not define a flag '
-    'with that name.  IMPORTANT: flags in this list that have '
-    'arguments MUST use the --flag=value format.', _helpers.SPECIAL_FLAGS)
+DEFINE_string('undefok', '',
+              'comma-separated list of flag names that it is okay to specify '
+              'on the command line even if the program does not define a flag '
+              'with that name.  IMPORTANT: flags in this list that have '
+              'arguments MUST use the --flag=value format.',
+              _helpers.SPECIAL_FLAGS)
