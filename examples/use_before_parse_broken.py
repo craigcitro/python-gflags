@@ -14,7 +14,6 @@ FLAGS = gflags.FLAGS
 # value of the flag.
 MY_CONST = FLAGS.test_flag
 
-
 def main(_):
   print MY_CONST  # Will ALWAYS output 'default value'
 
