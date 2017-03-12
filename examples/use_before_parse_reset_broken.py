@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""FLAGS.Reset() is evli."""
+"""FLAGS.Reset() is evil."""
 
 import unittest
 import gflags
