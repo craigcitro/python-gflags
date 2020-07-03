@@ -1,0 +1,18 @@
+os: linux
+dist: focal
+language: shell
+
+addons:
+  apt:
+    packages:
+      - python-gflags
+
+jobs:
+  include:
+    - dist: precise
+    - dist: trusty
+    - dist: xenial
+    - dist: bionic
+    - dist: focal
+  allow_failures:
+    - dist: focal  # google/python-gflags#44
